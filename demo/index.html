@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>file-dropzone demo</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../file-dropzone.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+      file-dropzone {
+        width: 100%;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic file-dropzone demo</h3>
+      <demo-snippet>
+        <template is="dom-bind" id="demo">
+          <file-dropzone
+            accept-mime-type="image/jpeg"
+            error-timeout="750"
+            on-file-added="_onfileAdded"
+            on-file-removed="_onfileRemoved"
+            on-file-rejected="_onfileRejected"
+          >
+            <h3>Drop a file</h3>
+          </file-dropzone>
+        </template>
+        <script>
+          demo._onfileAdded = function(evt, file) {
+            console.info('file added', file)
+          }  
+          demo._onfileRemoved = function(evt) {
+            console.info('file removed')
+          }  
+          demo._onfileRejected = function() {
+            console.warn('file rejected')
+          }  
+        </script>
+      </demo-snippet>
+    </div>
+  </body>
+</html>
