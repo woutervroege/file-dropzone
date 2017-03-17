@@ -6,6 +6,14 @@
 
     <title>file-dropzone demo</title>
 
+    <script>
+      window.Polymer = {
+        useNativeCSSProperties: true,
+        lazyRegister: true,
+        dom: 'shadow'
+      };
+    </script>
+
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
@@ -13,6 +21,11 @@
     <link rel="import" href="../file-dropzone.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
+      demo-snippet {
+        --demo-snippet-demo: {
+          display: block;
+        }
+      }
       file-dropzone {
         width: 100%;
         height: 300px;
@@ -26,25 +39,37 @@
         <template is="dom-bind" id="demo">
           <file-dropzone
             accept-mime-type="image/jpeg"
-            error-timeout="750"
+            rejection-timeout="750"
             on-file-added="_onfileAdded"
             on-file-removed="_onfileRemoved"
             on-file-rejected="_onfileRejected"
+            file-dragged="{{fileDragged}}"
+            file-rejected="{{fileRejected}}"
           >
-            <h3>Drop a file</h3>
+
+            <template is="dom-if" if="[[!fileRejected]]">
+              <h3 hidden$="[[fileDragged]]">Drag an image</h3>
+              <h3 hidden$="[[!fileDragged]]">Drop now!</h3>
+            </template>
+
+            <template is="dom-if" if="[[fileRejected]]">
+              <h3>File rejected</h3>
+            </template>
+
           </file-dropzone>
+          <script>
+            demo._onfileAdded = function(evt, file) {
+              alert('file added!')
+              console.info('file added', file);
+            }  
+            demo._onfileRemoved = function(evt) {
+              console.info('file removed');
+            }  
+            demo._onfileRejected = function() {
+              console.warn('file rejected');
+            }  
+          </script>
         </template>
-        <script>
-          demo._onfileAdded = function(evt, file) {
-            console.info('file added', file)
-          }  
-          demo._onfileRemoved = function(evt) {
-            console.info('file removed')
-          }  
-          demo._onfileRejected = function() {
-            console.warn('file rejected')
-          }  
-        </script>
       </demo-snippet>
     </div>
   </body>

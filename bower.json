@@ -1,6 +1,26 @@
 {
   "name": "file-dropzone",
+  "version": "1.0.0",
+  "description": "File Dropzone",
+  "authors": [
+    "Wouter Vroege"
+  ],
+  "keywords": [
+    "web-components",
+    "web-component",
+    "polymer",
+    "file",
+    "upload",
+    "dropzone",
+    "drag",
+    "drop"
+  ],
   "main": "file-dropzone.html",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/woutervroege/file-dropzone.git"
+  },
+  "homepage": "https://github.com/woutervroege/file-dropzone",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.8.0"
   },

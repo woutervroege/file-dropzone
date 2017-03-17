@@ -3,7 +3,6 @@
 <!--
 `file-dropzone`
 
-
 @demo demo/index.html 
 -->
 
@@ -16,28 +15,29 @@
         align-items: center;
         width: 100%;
         height: 100%;
-        --dropzone-tint-color: var(--ft-dropzone-tint-color, blue);
+        --file-dropzone: {
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          transition: 0.25s background-color;
+          background-color: var(--file-dropzone-background-color, #eeeeee);
+        }
       }
 
-      :host([drag-over-active]) {
-        --dropzone-tint-color: var(--ft-dropzone-tint-color--active, green);
+      :host #dropzone {
+        @apply --file-dropzone;
       }
 
-      :host([invalid-mime-type-added]) {
-        --dropzone-tint-color: var(--ft-dropzone-tint-color--invalid, red);
+      :host([file-dragged]) #dropzone {
+        background-color: var(--file-dropzone-background-color--dragged, #4be774);
       }
 
-      #dropzone {
-        @apply --ft-dropzone;
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        background-color: var(--dropzone-tint-color);
-        transition: 0.25s background-color;
+      :host([file-rejected]) #dropzone {
+        background-color: var(--file-dropzone-background-color--rejected, #e83131);
       }
     </style>
 
@@ -55,31 +55,49 @@
       is: 'file-dropzone',
       properties: {
 
-        dragOverActive: {
+        /**
+         * true if a file is dragged over the dropzone
+         */
+        fileDragged: {
           type: Boolean,
           value: false,
+          notify: true,
           reflectToAttribute: true,
         },
 
-        invalidMimeTypeAdded: {
+        /**
+         * true if the mime type of the dropped file does not match `acceptMimeType` value
+         */
+        fileRejected: {
           type: Boolean,
           value: false,
+          notify: true,
           reflectToAttribute: true,
-          observer: '_invalidMimeTypeAddedChanged'
+          observer: '_fileRejectedChanged'
         },
 
-        errorTimeout: {
+        /**
+         * Determines for how long `fileRejected`, in milliseconds
+         */
+        rejectionTimeout: {
           type: Number,
           value: 1000,
           notify: true,
         },
 
+        /**
+         * Determines whether a specific mime type is accepted
+         */
         acceptMimeType: {
           type: String,
           value: null,
+          notify: true,
           reflectToAttribute: true          
         },
 
+        /**
+         * The dropped `File` object
+         */
         file: {
           type: Object,
           value: null,
@@ -88,53 +106,44 @@
         },
 
       },
-      observers: [
-        'updateStyles(dragOverActive, file, invalidMimeTypeAdded)'
-      ],
-
-      _getActionHeading: function(dragOverActive, invalidMimeTypeAdded, acceptMimeType, instructionText, instructionTextDropped, instructionTextFileRejected) {
-        if(invalidMimeTypeAdded) return instructionTextFileRejected;
-        if(dragOverActive) return instructionTextDropped;
-        return instructionText;
-      },
 
       _handleDragOver: function(evt) {
         evt.preventDefault();
-        this.dragOverActive = true;
+        this.fileDragged = true;
       },
 
       _handleDragLeave: function(evt) {
         evt.preventDefault();
-        this.dragOverActive = false;
+        this.fileDragged = false;
       },
 
       _handleDrop: function(evt) {
         evt.preventDefault();
 
-        this.dragOverActive = false;
+        this.fileDragged = false;
 
         var file = evt.dataTransfer.files[0];
-        if(this.acceptMimeType && !file.type.match(this.acceptMimeType)) return this.invalidMimeTypeAdded = true;
+        if(this.acceptMimeType && !file.type.match(this.acceptMimeType)) return this.fileRejected = true;
 
         this.file = file;
       },
       
-      _handleFileChanged: function(file) {
+      _handleFileChanged: function(file, oldFile) {
         if(file) {
           this.fire('file-added', file);
         }
-        else {
+        if(!file && oldFile) {
           this.fire('file-removed');          
         }
        },
 
-      _invalidMimeTypeAddedChanged: function(invalidMimeTypeAdded) {
-        if(invalidMimeTypeAdded) {
+      _fileRejectedChanged: function(fileRejected) {
+        if(fileRejected) {
           this.fire('file-rejected')
         }
         window.setTimeout((function() {
-          this.invalidMimeTypeAdded = false;
-        }).bind(this), this.errorTimeout);
+          this.fileRejected = false;
+        }).bind(this), this.rejectionTimeout);
       }
 
     });
