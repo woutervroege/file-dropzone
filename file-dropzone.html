@@ -87,9 +87,9 @@
         /**
          * Determines whether a specific mime type is accepted
          */
-        acceptMimeType: {
+        accept: {
           type: String,
-          value: null,
+          value: '.*?/.*?',
           notify: true,
           reflectToAttribute: true          
         },
@@ -122,9 +122,20 @@
         this.fileDragged = false;
 
         var file = evt.dataTransfer.files[0];
-        if(this.acceptMimeType && !file.type.match(this.acceptMimeType)) return this.fileRejected = true;
+        var fileAccepted = file && this._fileTypeAccepted(file.type);
 
+        if(!fileAccepted) return this.fileRejected = true;
         this.file = file;
+      },
+
+      _fileTypeAccepted: function(fileType) {
+        if(!fileType) return false;
+        var acceptesMimeTypes = this.accept.split(/,/g);
+        for(var i in acceptesMimeTypes) {
+          var fileMatches = fileType.match(acceptesMimeTypes[i]);
+          if(fileMatches) return true;
+        }
+        return false;
       },
       
       _handleFileChanged: function(file, oldFile) {
